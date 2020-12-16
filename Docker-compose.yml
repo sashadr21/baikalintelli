@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    container_name: baikalintelli_django
+    volumes:
+      - ./baikalintelli:/baikalintelli
+    ports:
+      - "8000:8000"
+    command: "gunicorn baikalintelli.wsgi -b :8000 --reload"
+
+  nginx:
+    container_name: baikalintelli_nginx
+    image: nginx
+    expose:
+      - "80"
+    ports:
+      - "80:80"
+    volumes:
+      - ./etc/nginx:/etc/nginx
+      - ./baikalintelli/static:/var/www/static
+  db:
+    container_name: baikalintelli_pg
+    image: postgres:10.5
+    volumes:
+      - ./storage/postgres:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - "5432:5432"
+    #    environment:
+    #      - MYSQL_ALLOW_EMPTY_PASSWORD=1
